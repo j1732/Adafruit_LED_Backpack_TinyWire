@@ -28,7 +28,7 @@
 #include "WProgram.h"
 #endif
 
-#include <Adafruit_I2CDevice.h>
+#include "TinyWireM.h"
 
 #include "Adafruit_GFX.h"
 
@@ -68,7 +68,7 @@ public:
     @return  true if successful, otherwise false
 
   */
-  bool begin(uint8_t _addr = 0x70, TwoWire *theWire = &Wire);
+  void begin(uint8_t _addr = 0x70);
 
   /*!
     @brief  Set display brightness.
@@ -100,7 +100,7 @@ public:
   uint16_t displaybuffer[8]; ///< Raw display data
 
 protected:
-  Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
+  uint8_t i2c_dev = NULL; ///< Pointer to I2C bus interface
 };
 
 /*!

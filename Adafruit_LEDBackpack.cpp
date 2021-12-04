@@ -265,29 +265,29 @@ static const PROGMEM uint16_t alphafonttable[] = {
 void Adafruit_LEDBackpack::setBrightness(uint8_t b) {
   if (b > 15)
     b = 15; // limit to max brightness
-  uint8_t buffer = HT16K33_CMD_BRIGHTNESS | b;
-  i2c_dev->write(&buffer, 1);
+  TinyWireM.beginTransmission(i2c_dev);
+  TinyWireM.write(HT16K33_CMD_BRIGHTNESS | b);
+  TinyWireM.endTransmission();
 }
 
 void Adafruit_LEDBackpack::blinkRate(uint8_t b) {
+  TinyWireM.beginTransmission(i2c_dev);
   if (b > 3)
     b = 0; // turn off if not sure
-  uint8_t buffer = HT16K33_BLINK_CMD | HT16K33_BLINK_DISPLAYON | (b << 1);
-  i2c_dev->write(&buffer, 1);
+  TinyWireM.write(HT16K33_BLINK_CMD | HT16K33_BLINK_DISPLAYON | (b << 1));
+  TinyWireM.endTransmission();
 }
 
 Adafruit_LEDBackpack::Adafruit_LEDBackpack(void) {}
 
-bool Adafruit_LEDBackpack::begin(uint8_t _addr, TwoWire *theWire) {
-  if (i2c_dev)
-    delete i2c_dev;
-  i2c_dev = new Adafruit_I2CDevice(_addr, theWire);
-  if (!i2c_dev->begin())
-    return false;
+void Adafruit_LEDBackpack::begin(uint8_t _addr) {
+  i2c_dev = _addr;
 
   // turn on oscillator
-  uint8_t buffer[1] = {0x21};
-  i2c_dev->write(buffer, 1);
+  TinyWireM.begin();
+  TinyWireM.beginTransmission(i2c_dev);
+  TinyWireM.write(0x21);
+  TinyWireM.endTransmission();
 
   // internal RAM powers up with garbage/random values.
   // ensure internal RAM is cleared before turning on display
@@ -299,8 +299,6 @@ bool Adafruit_LEDBackpack::begin(uint8_t _addr, TwoWire *theWire) {
   blinkRate(HT16K33_BLINK_OFF);
 
   setBrightness(15); // max brightness
-
-  return true;
 }
 
 void Adafruit_LEDBackpack::writeDisplay(void) {
@@ -313,7 +311,9 @@ void Adafruit_LEDBackpack::writeDisplay(void) {
     buffer[2 + 2 * i] = displaybuffer[i] >> 8;
   }
 
-  i2c_dev->write(buffer, 17);
+  TinyWireM.beginTransmission(i2c_dev);
+  TinyWireM.write(buffer, 17);
+  TinyWireM.endTransmission();
 }
 
 void Adafruit_LEDBackpack::clear(void) {
@@ -689,7 +689,9 @@ void Adafruit_7segment::writeColon(void) {
   buffer[1] = displaybuffer[2] & 0xFF;
   buffer[2] = displaybuffer[2] >> 8;
 
-  i2c_dev->write(buffer, 3);
+  TinyWireM.beginTransmission(i2c_dev);
+  TinyWireM.write(buffer, 3);
+  TinyWireM.endTransmission();
 }
 
 void Adafruit_7segment::writeDigitNum(uint8_t d, uint8_t num, bool dot) {
