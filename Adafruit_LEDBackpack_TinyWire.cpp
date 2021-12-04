@@ -35,7 +35,7 @@
  *
  */
 
-#include "Adafruit_LEDBackpack.h"
+#include "Adafruit_LEDBackpack_TinyWire.h"
 #include "Adafruit_GFX.h"
 
 #ifndef _BV
